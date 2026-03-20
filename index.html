@@ -388,6 +388,83 @@
   </div>
 </section>
 
+<!-- Exclusive differentiators -->
+<section id="exclusive" style="border-top: 1px solid var(--border);">
+  <div class="section-label">Diferenciais Exclusivos</div>
+  <div class="section-title">O que so o RicardoDevin tem</div>
+  <div class="section-desc">Capacidades que nenhum concorrente oferece hoje. Nao e marketing &mdash; e verificavel no codigo.</div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+
+    <div style="background: linear-gradient(135deg, rgba(108,92,231,0.1), rgba(0,230,118,0.05)); border: 1px solid var(--accent); border-radius: 14px; padding: 2rem; position: relative;">
+      <div style="position: absolute; top: -10px; right: 1rem; background: var(--accent); color: #fff; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 4px;">Exclusivo</div>
+      <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">&#129504; Judge entre cada fase</h4>
+      <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">O agente nao avanca sem aprovacao. Um LLM judge valida cada transicao (exploring &rarr; researching &rarr; planning &rarr; implementing) com vereditos PASS / CONCERNS / REWORK / FAIL. Se falhar, refaz a fase inteira.</p>
+      <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted);">
+        <strong style="color: var(--red);">Devin:</strong> sem judge &nbsp;
+        <strong style="color: var(--red);">OpenHands:</strong> sem judge &nbsp;
+        <strong style="color: var(--red);">Cursor:</strong> sem judge
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(135deg, rgba(108,92,231,0.1), rgba(0,230,118,0.05)); border: 1px solid var(--accent); border-radius: 14px; padding: 2rem; position: relative;">
+      <div style="position: absolute; top: -10px; right: 1rem; background: var(--accent); color: #fff; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 4px;">Exclusivo</div>
+      <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">&#127919; Reparo tipado de falhas</h4>
+      <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Erros nao sao tratados como "conserte tudo". Um <code style="background: var(--surface2); padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.75rem;">FailureType</code> enum classifica cada erro (syntax, import, test, security, truncation) e roteia para um prompt especializado. Menos tokens, mais precisao.</p>
+      <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted);">
+        <strong style="color: var(--red);">Devin:</strong> reparo generico &nbsp;
+        <strong style="color: var(--red);">OpenHands:</strong> reparo generico &nbsp;
+        <strong style="color: var(--red);">Cursor:</strong> reparo generico
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(135deg, rgba(108,92,231,0.1), rgba(0,230,118,0.05)); border: 1px solid var(--accent); border-radius: 14px; padding: 2rem; position: relative;">
+      <div style="position: absolute; top: -10px; right: 1rem; background: var(--accent); color: #fff; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 4px;">Exclusivo</div>
+      <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">&#128737; 14 passes de sanitizacao</h4>
+      <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Antes de cada commit: bloqueio de arquivos perigosos, relocacao de testes, correcao de imports invalidos, merge inteligente de requirements.txt/package.json, auto-fix lint, truncation fix. Determinístico &mdash; nao depende do LLM.</p>
+      <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted);">
+        <strong style="color: var(--red);">Devin:</strong> 0 passes &nbsp;
+        <strong style="color: var(--red);">OpenHands:</strong> 0 passes &nbsp;
+        <strong style="color: var(--red);">Cursor:</strong> 0 passes
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(135deg, rgba(108,92,231,0.1), rgba(0,230,118,0.05)); border: 1px solid var(--accent); border-radius: 14px; padding: 2rem; position: relative;">
+      <div style="position: absolute; top: -10px; right: 1rem; background: var(--accent); color: #fff; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 4px;">Exclusivo</div>
+      <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">&#128722; Bloqueio de regressao</h4>
+      <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Se o agente regenerar um arquivo e perder &gt;20% dos elementos existentes (funcoes, classes, rotas, imports), o commit e bloqueado automaticamente. Protecao hard-coded, nao opcional.</p>
+      <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted);">
+        <strong style="color: var(--red);">Devin:</strong> sem bloqueio &nbsp;
+        <strong style="color: var(--red);">OpenHands:</strong> sem bloqueio &nbsp;
+        <strong style="color: var(--red);">Cursor:</strong> sem bloqueio
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(135deg, rgba(108,92,231,0.1), rgba(0,230,118,0.05)); border: 1px solid var(--accent); border-radius: 14px; padding: 2rem; position: relative;">
+      <div style="position: absolute; top: -10px; right: 1rem; background: var(--accent); color: #fff; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 4px;">Exclusivo</div>
+      <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">&#128208; Merge inteligente de compartilhados</h4>
+      <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">requirements.txt, package.json e main.py nunca sao sobrescritos. O sistema mescla dependencias, preserva keys existentes e valida metadata do app. Zero perda de configuracao.</p>
+      <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted);">
+        <strong style="color: var(--red);">Devin:</strong> sobrescreve &nbsp;
+        <strong style="color: var(--red);">OpenHands:</strong> sobrescreve &nbsp;
+        <strong style="color: var(--red);">Cursor:</strong> sobrescreve
+      </div>
+    </div>
+
+    <div style="background: linear-gradient(135deg, rgba(108,92,231,0.1), rgba(0,230,118,0.05)); border: 1px solid var(--accent); border-radius: 14px; padding: 2rem; position: relative;">
+      <div style="position: absolute; top: -10px; right: 1rem; background: var(--accent); color: #fff; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 4px;">Exclusivo</div>
+      <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;">&#9878; Reparo em 2 camadas</h4>
+      <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Camada 1: reparo local pre-commit (barato, ate 5 tentativas). Camada 2: reparo pos-CI com logs reais do GitHub Actions (ate 3 tentativas). Resolve problemas de integracao que so aparecem no CI.</p>
+      <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted);">
+        <strong style="color: var(--red);">Devin:</strong> 1 camada &nbsp;
+        <strong style="color: var(--red);">OpenHands:</strong> 1 camada &nbsp;
+        <strong style="color: var(--red);">Cursor:</strong> 1 camada
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- Pipeline -->
 <section id="pipeline">
   <div class="section-label">Framework Arche</div>

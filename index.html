@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RicardoDevin — Autonomous Code Agent</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a27;
+    --border: #2a2a3a;
+    --text: #e4e4ef;
+    --text-muted: #8888a0;
+    --accent: #6c5ce7;
+    --accent2: #a29bfe;
+    --green: #00e676;
+    --green-dim: #00c853;
+    --red: #ff5252;
+    --yellow: #ffd740;
+    --blue: #448aff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .nav-logo .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a { color: var(--text-muted); font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(108,92,231,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 999px;
+    padding: 0.4rem 1rem; font-size: 0.78rem; color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+  .hero-badge .live { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .hero h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800; letter-spacing: -0.03em;
+    line-height: 1.1; max-width: 800px;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 .gradient {
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--green));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: 1.15rem; color: var(--text-muted);
+    max-width: 600px; margin-bottom: 2.5rem;
+  }
+  .hero-cta {
+    display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.75rem 1.75rem; border-radius: 8px;
+    font-size: 0.9rem; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #5a4bd4; text-decoration: none; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--accent); text-decoration: none; }
+
+  /* Stats strip */
+  .stats {
+    display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;
+    padding: 2rem; margin-top: 2rem;
+  }
+  .stat { text-align: center; }
+  .stat-value { font-size: 2rem; font-weight: 800; color: var(--green); }
+  .stat-label { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem; }
+
+  /* Section */
+  section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent2); margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 800; letter-spacing: -0.02em; margin-bottom: 1rem;
+  }
+  .section-desc {
+    font-size: 1.05rem; color: var(--text-muted); max-width: 700px; margin-bottom: 3rem;
+  }
+
+  /* Pipeline visual */
+  .pipeline {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; flex-wrap: wrap; margin: 3rem 0;
+  }
+  .pipeline-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 200px;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .pipeline-step:hover { border-color: var(--accent); transform: translateY(-4px); }
+  .pipeline-step .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    font-size: 0.75rem; font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+  .pipeline-step h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .pipeline-step p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
+  .pipeline-arrow {
+    font-size: 1.5rem; color: var(--accent2); padding: 0 0.5rem;
+    flex-shrink: 0;
+  }
+  .pipeline-judge {
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    margin-top: 0.75rem; padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.7rem; color: var(--green); font-weight: 600;
+  }
+
+  /* Quality gates */
+  .gates-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  .gate-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+  }
+  .gate-card:hover { border-color: var(--green); }
+  .gate-card .gate-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; margin-bottom: 1rem;
+    background: rgba(108,92,231,0.15);
+  }
+  .gate-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.4rem; }
+  .gate-card p { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
+
+  /* Comparison */
+  .comparison-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.82rem;
+    margin-top: 2rem;
+  }
+  .comparison-table th, .comparison-table td {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .comparison-table th {
+    font-weight: 700; font-size: 0.75rem;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-muted);
+    background: var(--surface);
+    position: sticky; top: 60px;
+  }
+  .comparison-table th:first-child { border-radius: 8px 0 0 0; }
+  .comparison-table th:last-child { border-radius: 0 8px 0 0; }
+  .comparison-table td { color: var(--text-muted); line-height: 1.5; }
+  .comparison-table td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
+  .col-highlight { background: rgba(108,92,231,0.06); color: var(--text) !important; }
+  .badge-strong {
+    display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  }
+  .badge-forte { background: rgba(0,230,118,0.15); color: var(--green); }
+  .badge-medio { background: rgba(255,215,64,0.15); color: var(--yellow); }
+  .badge-fraco { background: rgba(255,82,82,0.12); color: var(--red); }
+  .badge-inexistente { background: rgba(136,136,160,0.12); color: var(--text-muted); }
+
+  /* Score grid */
+  .score-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem; margin-top: 2rem;
+  }
+  .score-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.25rem; display: flex; align-items: center; gap: 1rem;
+  }
+  .score-card .dimension { flex: 1; font-size: 0.85rem; font-weight: 600; }
+  .score-bar {
+    display: flex; gap: 3px;
+  }
+  .score-dot {
+    width: 20px; height: 8px; border-radius: 2px;
+  }
+  .score-dot.on-green { background: var(--green); }
+  .score-dot.on-yellow { background: var(--yellow); }
+  .score-dot.on-red { background: var(--red); }
+  .score-dot.off { background: var(--surface2); }
+
+  /* Repair loop */
+  .repair-visual {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  .repair-layer {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 2rem;
+  }
+  .repair-layer h4 {
+    font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .repair-layer .tag {
+    font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 4px;
+    font-weight: 700; text-transform: uppercase;
+  }
+  .tag-cheap { background: rgba(0,230,118,0.15); color: var(--green); }
+  .tag-thorough { background: rgba(68,138,255,0.15); color: var(--blue); }
+  .repair-layer p { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.5; }
+  .repair-layer ul { margin-top: 0.75rem; padding-left: 1.2rem; }
+  .repair-layer li { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+
+  /* Stack */
+  .stack-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.75rem; margin-top: 2rem;
+  }
+  .stack-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.75rem 1rem;
+    display: flex; flex-direction: column; gap: 0.2rem;
+  }
+  .stack-item .stack-role { font-size: 0.65rem; color: var(--accent2); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stack-item .stack-tech { font-size: 0.85rem; font-weight: 600; }
+
+  /* Pricing */
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem; margin-top: 2rem;
+  }
+  .pricing-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem; position: relative;
+    transition: all 0.3s;
+  }
+  .pricing-card.featured {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(108,92,231,0.08), rgba(0,230,118,0.04));
+  }
+  .pricing-card.featured::before {
+    content: 'Seu sistema';
+    position: absolute; top: -10px; left: 1.5rem;
+    background: var(--accent); color: #fff;
+    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+    padding: 0.2rem 0.75rem; border-radius: 4px;
+  }
+  .pricing-card h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .pricing-card .price { font-size: 1.8rem; font-weight: 800; margin: 1rem 0; }
+  .pricing-card .price span { font-size: 0.85rem; font-weight: 400; color: var(--text-muted); }
+  .pricing-card .price-note { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+  .pricing-card ul { list-style: none; padding: 0; }
+  .pricing-card li {
+    font-size: 0.82rem; color: var(--text-muted);
+    padding: 0.4rem 0; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; gap: 0.5rem;
+  }
+  .pricing-card li::before { content: ''; flex-shrink: 0; }
+  .pricing-card li.pro::before { content: '+'; color: var(--green); font-weight: 700; }
+  .pricing-card li.con::before { content: '-'; color: var(--red); font-weight: 700; }
+
+  /* CTA */
+  .cta-section {
+    text-align: center; padding: 6rem 2rem;
+    background: linear-gradient(180deg, var(--bg), var(--surface));
+    border-top: 1px solid var(--border);
+  }
+  .cta-section h2 {
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    font-weight: 800; margin-bottom: 1rem;
+  }
+  .cta-section p { color: var(--text-muted); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+  /* Footer */
+  footer {
+    text-align: center; padding: 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem; color: var(--text-muted);
+  }
+
+  /* Flow diagram */
+  .flow {
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+    margin: 3rem auto; max-width: 500px;
+  }
+  .flow-step {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.75rem 1.5rem;
+    text-align: center; width: 100%;
+    font-size: 0.85rem; font-weight: 600;
+  }
+  .flow-arrow { color: var(--accent2); font-size: 1.2rem; padding: 0.25rem 0; }
+  .flow-step.flow-green { border-color: var(--green); }
+  .flow-step.flow-accent { border-color: var(--accent); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .pipeline { flex-direction: column; align-items: center; }
+    .pipeline-arrow { transform: rotate(90deg); }
+    .repair-visual { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .comparison-table { font-size: 0.72rem; }
+    .comparison-table th, .comparison-table td { padding: 0.6rem 0.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo"><span class="dot"></span> RicardoDevin</div>
+  <div class="nav-links">
+    <a href="#pipeline">Pipeline</a>
+    <a href="#quality">Quality Gates</a>
+    <a href="#repair">Reparo</a>
+    <a href="#compare">Comparativo</a>
+    <a href="#stack">Stack</a>
+    <a href="#pricing">Custo</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge"><span class="live"></span> Sistema operando 24/7</div>
+  <h1>Da issue ao merge.<br><span class="gradient">Sem humanos no caminho.</span></h1>
+  <p>Sistema multi-agente que transforma issues do GitHub em pull requests prontos para producao &mdash; com quality gates rigorosos, reparo automatico em duas camadas, e custo de centavos por issue.</p>
+  <div class="hero-cta">
+    <a href="https://github.com/ricardobnjunior" class="btn btn-primary">Ver no GitHub</a>
+    <a href="#compare" class="btn btn-outline">Comparar com mercado</a>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-value">4</div><div class="stat-label">Fases cognitivas com judge</div></div>
+    <div class="stat"><div class="stat-value">12</div><div class="stat-label">Nos no grafo LangGraph</div></div>
+    <div class="stat"><div class="stat-value">14</div><div class="stat-label">Passes de sanitizacao</div></div>
+    <div class="stat"><div class="stat-value">5+3</div><div class="stat-label">Tentativas de reparo (pre + pos CI)</div></div>
+  </div>
+</section>
+
+<!-- Pipeline -->
+<section id="pipeline">
+  <div class="section-label">Framework Arche</div>
+  <div class="section-title">Pipeline cognitivo de 4 fases</div>
+  <div class="section-desc">O agente nao gera codigo de primeira. Ele explora, pesquisa, planeja e so entao implementa. Cada fase e validada por um judge LLM com vereditos estruturados (PASS / CONCERNS / REWORK / FAIL).</div>
+
+  <div class="pipeline">
+    <div class="pipeline-step">
+      <div class="step-num">1</div>
+      <h4>Exploring</h4>
+      <p>Le a issue + codebase. Mapeia arquivos, padroes e dependencias.</p>
+      <div class="pipeline-judge">&#10003; Judge valida</div>
+    </div>
+    <div class="pipeline-arrow">&#8594;</div>
+    <div class="pipeline-step">
+      <div class="step-num">2</div>
+      <h4>Researching</h4>
+      <p>Analisa complexidade. Busca docs via web (Tavily / SearXNG).</p>
+      <div class="pipeline-judge">&#10003; Judge valida</div>
+    </div>
+    <div class="pipeline-arrow">&#8594;</div>
+    <div class="pipeline-step">
+      <div class="step-num">3</div>
+      <h4>Planning</h4>
+      <p>Define estrategia, TODOs e estrutura de arquivos.</p>
+      <div class="pipeline-judge">&#10003; Judge valida</div>
+    </div>
+    <div class="pipeline-arrow">&#8594;</div>
+    <div class="pipeline-step">
+      <div class="step-num">4</div>
+      <h4>Implementing</h4>
+      <p>Gera codigo + testes em lotes (ate 5 batches, 15 arquivos/batch).</p>
+      <div class="pipeline-judge">&#10003; Judge valida</div>
+    </div>
+  </div>
+</section>
+
+<!-- Quality Gates -->
+<section id="quality">
+  <div class="section-label">Quality Gates</div>
+  <div class="section-title">5 camadas de validacao antes do commit</div>
+  <div class="section-desc">Nenhuma linha chega ao repositorio sem passar por validacao de sintaxe, seguranca, review por LLM, checagem de regressao e 14 passes de sanitizacao deterministica.</div>
+
+  <div class="gates-grid">
+    <div class="gate-card">
+      <div class="gate-icon">&#128269;</div>
+      <h4>Validacao de Codigo</h4>
+      <p>Syntax check (AST), instalacao de deps, resolucao de imports, pytest + coverage, deteccao de truncamento.</p>
+    </div>
+    <div class="gate-card">
+      <div class="gate-icon">&#128274;</div>
+      <h4>Scan de Seguranca</h4>
+      <p>Bandit (vulnerabilidades Python) + Semgrep (padroes semanticos). Bloqueia commits inseguros.</p>
+    </div>
+    <div class="gate-card">
+      <div class="gate-icon">&#129302;</div>
+      <h4>Code Review por LLM</h4>
+      <p>Qualidade, aderencia ao ticket, scope drift, over-engineering, risco de regressao.</p>
+    </div>
+    <div class="gate-card">
+      <div class="gate-icon">&#128202;</div>
+      <h4>Regressao Incremental</h4>
+      <p>Compara gerado vs existente. Bloqueia se &gt;20% dos elementos (funcoes, classes, rotas) sumiram.</p>
+    </div>
+    <div class="gate-card">
+      <div class="gate-icon">&#128736;</div>
+      <h4>Sanitizacao (14 passes)</h4>
+      <p>Bloqueio de arquivos perigosos, merge inteligente de compartilhados, auto-fix lint, correcao de imports.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Repair Loop -->
+<section id="repair">
+  <div class="section-label">Auto-Reparo</div>
+  <div class="section-title">Duas camadas de recuperacao automatica</div>
+  <div class="section-desc">Erros sao classificados por tipo (syntax, import, test, security, truncation) e roteados para prompts especializados. Nada de "conserte tudo" generico.</div>
+
+  <div class="repair-visual">
+    <div class="repair-layer">
+      <h4>Camada 1: Pre-Commit <span class="tag tag-cheap">Barato</span></h4>
+      <p>Resolve a maioria dos erros antes de tocar no repositorio.</p>
+      <ul>
+        <li>FailureType enum classifica cada erro</li>
+        <li>Prompts especializados por tipo de falha</li>
+        <li>Ate 5 tentativas com deteccao de convergencia</li>
+        <li>Envia apenas arquivos afetados (economia de tokens)</li>
+      </ul>
+    </div>
+    <div class="repair-layer">
+      <h4>Camada 2: Pos-CI <span class="tag tag-thorough">Completo</span></h4>
+      <p>Usa logs reais do GitHub Actions para corrigir falhas de integracao.</p>
+      <ul>
+        <li>Aguarda CI completar via GitHub Checks API</li>
+        <li>Busca annotations + workflow logs</li>
+        <li>Ate 3 tentativas de correcao</li>
+        <li>Escala para review humano se nao converge</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Comparison -->
+<section id="compare">
+  <div class="section-label">Comparativo</div>
+  <div class="section-title">RicardoDevin vs. Mercado</div>
+  <div class="section-desc">Comparacao honesta e verificada (marco 2026). Onde somos melhores, onde o mercado ganha.</div>
+
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th>Criterio</th>
+        <th class="col-highlight">RicardoDevin</th>
+        <th>Devin (Cognition)</th>
+        <th>OpenHands</th>
+        <th>Cursor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Paradigma</td>
+        <td class="col-highlight">Pipeline estrito 4 fases + judge validando cada transicao</td>
+        <td>Agente autonomo com planejamento dinamico em sandbox (shell + browser + editor)</td>
+        <td>Arquitetura CodeAct &mdash; codigo + bash + browser em containers Docker isolados</td>
+        <td>Agent Mode local (interativo) + Background Agents (fev 2026, VMs cloud async) + Automations (mar 2026)</td>
+      </tr>
+      <tr>
+        <td>Orquestracao LLMs</td>
+        <td class="col-highlight">Multi-modelo: DeepSeek v3 (geracao), Gemini Flash (judge), Claude (fallback)</td>
+        <td>Modelos proprietarios fine-tuned da Cognition</td>
+        <td>Agnostico (BYOK). Mesmo LLM para tudo</td>
+        <td>Hibrido: modelos rapidos para autocomplete, pesados para agent mode</td>
+      </tr>
+      <tr>
+        <td>Prevencao de Regressao</td>
+        <td class="col-highlight">Extrema. Merge inteligente + bloqueio hard se &gt;20% elementos perdidos</td>
+        <td>Moderada. Diff + testes no sandbox, sem checagem estruturada</td>
+        <td>Baixa-moderada. Depende dos testes no container</td>
+        <td>Local: manual (dev revisa). Background Agents: testes antes do PR, sem checagem incremental</td>
+      </tr>
+      <tr>
+        <td>Reparo</td>
+        <td class="col-highlight">2 camadas (pre-commit tipado + pos-CI com logs reais). Ate 5+3 tentativas</td>
+        <td>Continua no sandbox. Le terminal, itera ate funcionar</td>
+        <td>Iterativa. Le log, gera patch, re-executa. Sem classificacao de falhas</td>
+        <td>Local: humano aponta. Background Agents: iteram sozinhos</td>
+      </tr>
+      <tr>
+        <td>Sandboxing</td>
+        <td class="col-highlight">Docker isolado sem rede. Validacao estatica (pytest + AST)</td>
+        <td>VMs cloud completas: terminal + browser + editor. Instala, roda, navega</td>
+        <td>Docker com REST API. Imagens customizadas. Seguranca por design</td>
+        <td>Local: ambiente do dev. Background: VMs Ubuntu cloud com internet</td>
+      </tr>
+      <tr>
+        <td>Custo / issue</td>
+        <td class="col-highlight">Centavos (DeepSeek + Gemini Flash via OpenRouter)</td>
+        <td>$9-18/task complexa ($2.25/ACU ~15min)</td>
+        <td>Variavel (custo da API injetada)</td>
+        <td>~$20/mes base + creditos para Background Agents</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Score Grid -->
+  <h3 style="font-size: 1.2rem; font-weight: 800; margin-top: 4rem; margin-bottom: 0.5rem;">Resumo por Dimensao</h3>
+  <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Verde = forte, Amarelo = medio, Vermelho = fraco, Cinza = inexistente</p>
+
+  <div style="overflow-x:auto;">
+    <table class="comparison-table" style="min-width: 700px;">
+      <thead>
+        <tr>
+          <th>Dimensao</th>
+          <th class="col-highlight">RicardoDevin</th>
+          <th>Devin</th>
+          <th>OpenHands</th>
+          <th>Cursor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Pipeline estruturado</td>
+          <td class="col-highlight"><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-medio">Medio</span></td>
+          <td><span class="badge-strong badge-medio">Medio</span></td>
+          <td><span class="badge-strong badge-fraco">Fraco</span></td>
+        </tr>
+        <tr>
+          <td>Quality gates</td>
+          <td class="col-highlight"><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-medio">Medio</span></td>
+          <td><span class="badge-strong badge-medio">Medio</span></td>
+          <td><span class="badge-strong badge-medio">Fraco-Medio</span></td>
+        </tr>
+        <tr>
+          <td>Custo por issue</td>
+          <td class="col-highlight"><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-medio">Medio</span></td>
+          <td><span class="badge-strong badge-medio">Variavel</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+        </tr>
+        <tr>
+          <td>Transparencia</td>
+          <td class="col-highlight"><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-fraco">Fraco</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-medio">Medio</span></td>
+        </tr>
+        <tr>
+          <td>Protecao contra regressao</td>
+          <td class="col-highlight"><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-fraco">Fraco</span></td>
+          <td><span class="badge-strong badge-fraco">Fraco</span></td>
+          <td><span class="badge-strong badge-fraco">Fraco</span></td>
+        </tr>
+        <tr>
+          <td>Qualidade bruta de geracao</td>
+          <td class="col-highlight"><span class="badge-strong badge-fraco">Fraco</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-medio">Medio-Forte</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+        </tr>
+        <tr>
+          <td>Sandbox interativo</td>
+          <td class="col-highlight"><span class="badge-strong badge-fraco">Fraco</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-medio">Medio-Forte</span></td>
+        </tr>
+        <tr>
+          <td>Benchmark reproduzivel</td>
+          <td class="col-highlight"><span class="badge-strong badge-inexistente">Inexistente</span></td>
+          <td><span class="badge-strong badge-medio">Medio</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-inexistente">Inexistente</span></td>
+        </tr>
+        <tr>
+          <td>Multi-linguagem</td>
+          <td class="col-highlight"><span class="badge-strong badge-fraco">Fraco</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+        </tr>
+        <tr>
+          <td>Escala</td>
+          <td class="col-highlight"><span class="badge-strong badge-fraco">Fraco</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-medio">Medio</span></td>
+          <td><span class="badge-strong badge-medio">Medio-Forte</span></td>
+        </tr>
+        <tr>
+          <td>Comunidade</td>
+          <td class="col-highlight"><span class="badge-strong badge-inexistente">Inexistente</span></td>
+          <td><span class="badge-strong badge-medio">Medio</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+        </tr>
+        <tr>
+          <td>Autonomia assincrona</td>
+          <td class="col-highlight"><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-medio">Medio-Forte</span></td>
+        </tr>
+        <tr>
+          <td>Edicao cirurgica</td>
+          <td class="col-highlight"><span class="badge-strong badge-fraco">Fraco</span></td>
+          <td><span class="badge-strong badge-medio">Medio</span></td>
+          <td><span class="badge-strong badge-medio">Medio</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+        </tr>
+        <tr>
+          <td>Interacao humana no loop</td>
+          <td class="col-highlight"><span class="badge-strong badge-fraco">Fraco</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+          <td><span class="badge-strong badge-medio">Medio</span></td>
+          <td><span class="badge-strong badge-forte">Forte</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Honesty: weaknesses -->
+<section id="weaknesses" style="border-top: 1px solid var(--border); padding-top: 4rem;">
+  <div class="section-label">Transparencia</div>
+  <div class="section-title">Onde precisamos melhorar</div>
+  <div class="section-desc">Engenharia de processo sofisticada rodando em infraestrutura artesanal. Estes sao os gaps reais que separam o RicardoDevin dos lideres do mercado.</div>
+
+  <div class="gates-grid">
+    <div class="gate-card" style="border-color: var(--red);">
+      <div class="gate-icon" style="background: rgba(255,82,82,0.12);">&#9888;</div>
+      <h4>Sem benchmark publico</h4>
+      <p>Nao temos resultados no SWE-bench ou qualquer benchmark reproduzivel. Funciona nos nossos repos, mas sem evidencia de generalizacao.</p>
+    </div>
+    <div class="gate-card" style="border-color: var(--red);">
+      <div class="gate-icon" style="background: rgba(255,82,82,0.12);">&#9888;</div>
+      <h4>Sem edicao cirurgica</h4>
+      <p>Gera arquivos inteiros. Para mudar 1 linha, reescreve tudo. Em arquivos &gt;500 linhas, risco real de truncamento e perda de conteudo.</p>
+    </div>
+    <div class="gate-card" style="border-color: var(--red);">
+      <div class="gate-icon" style="background: rgba(255,82,82,0.12);">&#9888;</div>
+      <h4>Fire-and-forget</h4>
+      <p>Sem como guiar o agente durante a execucao. Funciona de primeira (com retries) ou escala para review manual. Sem interacao no loop.</p>
+    </div>
+    <div class="gate-card" style="border-color: var(--red);">
+      <div class="gate-icon" style="background: rgba(255,82,82,0.12);">&#9888;</div>
+      <h4>Modelos nao-frontier</h4>
+      <p>DeepSeek v3 e Gemini Flash sao fortes, mas nao sao frontier para coding. Qualidade bruta de geracao inferior ao Claude Opus ou GPT-4o em tasks complexas.</p>
+    </div>
+    <div class="gate-card" style="border-color: var(--red);">
+      <div class="gate-icon" style="background: rgba(255,82,82,0.12);">&#9888;</div>
+      <h4>Foco em Python</h4>
+      <p>Frontend (React/TS) suportado com menos profundidade. Go, Rust, Java sem suporte em prompts nem validacao.</p>
+    </div>
+    <div class="gate-card" style="border-color: var(--red);">
+      <div class="gate-icon" style="background: rgba(255,82,82,0.12);">&#9888;</div>
+      <h4>Single-threaded</h4>
+      <p>1 issue por vez. Sem fila, sem monitoramento de saude, sem SLA. Sem comunidade ou ecossistema de plugins.</p>
+    </div>
+  </div>
+
+  <div style="margin-top: 2.5rem; padding: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px;">
+    <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; font-style: italic;">
+      <strong style="color: var(--text);">Veredicto:</strong> RicardoDevin tem engenharia de processo que compete conceitualmente com os melhores &mdash; reparo tipado, sanitizacao de 14 passes, e protecao de regressao vao alem do que a maioria oferece. Mas perde em potencia bruta: modelos nao-frontier, sem sandbox interativo, sem benchmark, sem escala, sem comunidade. E um sistema com <strong style="color: var(--text);">engenharia de processo sofisticada</strong> rodando em <strong style="color: var(--text);">infraestrutura artesanal</strong>. O caminho para competir de verdade passa por: benchmark publico (SWE-bench), sandbox com terminal, suporte multi-linguagem, e edicao cirurgica via diffs.
+    </p>
+  </div>
+</section>
+
+<!-- Stack -->
+<section id="stack">
+  <div class="section-label">Stack Tecnica</div>
+  <div class="section-title">Construido com tecnologias de producao</div>
+
+  <div class="stack-grid">
+    <div class="stack-item"><span class="stack-role">LLM Provider</span><span class="stack-tech">OpenRouter (multi-modelo)</span></div>
+    <div class="stack-item"><span class="stack-role">Geracao</span><span class="stack-tech">DeepSeek v3</span></div>
+    <div class="stack-item"><span class="stack-role">Judge</span><span class="stack-tech">Gemini 2.5 Flash</span></div>
+    <div class="stack-item"><span class="stack-role">Fallback</span><span class="stack-tech">Claude Sonnet</span></div>
+    <div class="stack-item"><span class="stack-role">Framework</span><span class="stack-tech">LangGraph + LangChain</span></div>
+    <div class="stack-item"><span class="stack-role">Analise</span><span class="stack-tech">Tree-sitter + AST</span></div>
+    <div class="stack-item"><span class="stack-role">Seguranca</span><span class="stack-tech">Bandit + Semgrep</span></div>
+    <div class="stack-item"><span class="stack-role">Busca Web</span><span class="stack-tech">Tavily + SearXNG</span></div>
+    <div class="stack-item"><span class="stack-role">Qualidade</span><span class="stack-tech">ruff + pytest + coverage</span></div>
+    <div class="stack-item"><span class="stack-role">RAG</span><span class="stack-tech">ChromaDB</span></div>
+    <div class="stack-item"><span class="stack-role">API</span><span class="stack-tech">FastAPI + Uvicorn + SSE</span></div>
+    <div class="stack-item"><span class="stack-role">Frontend</span><span class="stack-tech">React + TypeScript + Vite</span></div>
+    <div class="stack-item"><span class="stack-role">Git</span><span class="stack-tech">ghapi (GitHub API)</span></div>
+    <div class="stack-item"><span class="stack-role">CI/CD</span><span class="stack-tech">GitHub Actions</span></div>
+    <div class="stack-item"><span class="stack-role">Containers</span><span class="stack-tech">Docker + Compose</span></div>
+    <div class="stack-item"><span class="stack-role">Observabilidade</span><span class="stack-tech">LangFuse</span></div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing">
+  <div class="section-label">Custo Real</div>
+  <div class="section-title">Honestidade sobre precos</div>
+  <div class="section-desc">Comparacao de custo verificada em marco de 2026.</div>
+
+  <div class="pricing-grid">
+    <div class="pricing-card featured">
+      <h3>RicardoDevin</h3>
+      <div class="price">Centavos <span>/ issue</span></div>
+      <div class="price-note">DeepSeek + Gemini Flash via OpenRouter. Custo real depende da complexidade. Sem assinatura.</div>
+      <ul>
+        <li class="pro">Multi-modelo: cada papel usa o modelo mais barato</li>
+        <li class="pro">Sem vendor lock-in</li>
+        <li class="pro">Self-hosted (voce controla)</li>
+        <li class="con">Requer infra propria</li>
+        <li class="con">Single-threaded</li>
+      </ul>
+    </div>
+    <div class="pricing-card">
+      <h3>Devin</h3>
+      <div class="price">$2.25 <span>/ ACU (~15min)</span></div>
+      <div class="price-note">Core: $20/mes minimo. Team: $500/mes (250 ACUs). Task complexa: $9-18.</div>
+      <ul>
+        <li class="pro">Sandbox completo (terminal + browser)</li>
+        <li class="pro">Modelos proprietarios otimizados</li>
+        <li class="pro">UX polida, pronto para usar</li>
+        <li class="con">Caixa preta</li>
+        <li class="con">Custo escala com complexidade</li>
+      </ul>
+    </div>
+    <div class="pricing-card">
+      <h3>OpenHands</h3>
+      <div class="price">Variavel</div>
+      <div class="price-note">Custo da API key injetada (Claude, GPT, etc). Infra self-hosted.</div>
+      <ul>
+        <li class="pro">100% open source (50k+ stars)</li>
+        <li class="pro">Arquitetura CodeAct robusta</li>
+        <li class="pro">Benchmark proprio (OpenHands Index)</li>
+        <li class="con">Requer infra pesada</li>
+        <li class="con">Sem orquestracao multi-modelo</li>
+      </ul>
+    </div>
+    <div class="pricing-card">
+      <h3>Cursor</h3>
+      <div class="price">~$20 <span>/ mes</span></div>
+      <div class="price-note">Plano base. Background Agents consomem creditos extras.</div>
+      <ul>
+        <li class="pro">Velocidade instantanea no agent mode</li>
+        <li class="pro">Background Agents async (fev 2026)</li>
+        <li class="pro">Automations por triggers (mar 2026)</li>
+        <li class="con">Background Agents em maturacao</li>
+        <li class="con">Agent local requer humano pilotando</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Flow -->
+<section>
+  <div class="section-label">Fluxo End-to-End</div>
+  <div class="section-title">Da issue ao merge em 10 passos</div>
+
+  <div class="flow">
+    <div class="flow-step">1. Issue criada no GitHub com label "agent"</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">2. Orquestrador detecta &rarr; triage</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step flow-accent">3. Router classifica tipo (backend / frontend / mixed)</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step flow-accent">4. Pipeline Arche: exploring &rarr; researching &rarr; planning &rarr; implementing</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">5. Quality Gates (5 camadas + 14 passes sanitizacao)</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">6. Commit atomico (Git Trees API) &rarr; Branch &rarr; PR</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">7. CI Gate: aguarda GitHub Actions (reparo pos-CI se falhar)</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">8. Classificacao: auto-approve ou needs-review</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step flow-green">9. Merge automatico ou aguarda review humano</div>
+    <div class="flow-arrow">&#8595;</div>
+    <div class="flow-step">10. Memoria: armazena feedback para issues futuras</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Engenharia de processo sofisticada.<br>Custo de centavos por issue.</h2>
+  <p>Pipeline cognitivo de 4 fases, quality gates rigorosos, reparo tipado em 2 camadas, e transparencia total. Open source.</p>
+  <a href="https://github.com/ricardobnjunior" class="btn btn-primary">Explorar no GitHub</a>
+</div>
+
+<!-- Footer -->
+<footer>
+  <p>RicardoDevin &mdash; Sistema Autonomo de Geracao de Codigo &mdash; Dados verificados em marco de 2026</p>
+  <p style="margin-top:0.5rem;">
+    Fontes:
+    <a href="https://cognition.ai/blog/devin-2">Devin 2.0</a> &middot;
+    <a href="https://devin.ai/pricing/">Devin Pricing</a> &middot;
+    <a href="https://github.com/OpenHands/OpenHands">OpenHands</a> &middot;
+    <a href="https://docs.cursor.com/en/background-agent">Cursor Background Agents</a> &middot;
+    <a href="https://www.swebench.com/viewer.html">SWE-bench</a>
+  </p>
+</footer>
+
+</body>
+</html>

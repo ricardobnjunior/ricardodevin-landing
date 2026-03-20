@@ -200,7 +200,7 @@
     text-transform: uppercase; letter-spacing: 0.05em;
     color: var(--text-muted);
     background: var(--surface);
-    position: sticky; top: 60px;
+    position: static;
   }
   .comparison-table th:first-child { border-radius: 8px 0 0 0; }
   .comparison-table th:last-child { border-radius: 0 8px 0 0; }
@@ -212,7 +212,10 @@
     font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
   }
   .badge-forte { background: rgba(0,230,118,0.15); color: var(--green); }
+  .badge-medio-forte { background: rgba(0,230,118,0.08); color: #66d9a0; border: 1px solid rgba(0,230,118,0.2); }
   .badge-medio { background: rgba(255,215,64,0.15); color: var(--yellow); }
+  .badge-fraco-medio { background: rgba(255,152,0,0.15); color: #ffab40; }
+  .badge-variavel { background: rgba(68,138,255,0.15); color: var(--blue); }
   .badge-fraco { background: rgba(255,82,82,0.12); color: var(--red); }
   .badge-inexistente { background: rgba(136,136,160,0.12); color: var(--text-muted); }
 
@@ -577,13 +580,13 @@
           <td class="col-highlight"><span class="badge-strong badge-forte">Forte</span></td>
           <td><span class="badge-strong badge-medio">Medio</span></td>
           <td><span class="badge-strong badge-medio">Medio</span></td>
-          <td><span class="badge-strong badge-medio">Fraco-Medio</span></td>
+          <td><span class="badge-strong badge-fraco-medio">Fraco-Medio</span></td>
         </tr>
         <tr>
           <td>Custo por issue</td>
           <td class="col-highlight"><span class="badge-strong badge-forte">Forte</span></td>
           <td><span class="badge-strong badge-medio">Medio</span></td>
-          <td><span class="badge-strong badge-medio">Variavel</span></td>
+          <td><span class="badge-strong badge-variavel">Variavel</span></td>
           <td><span class="badge-strong badge-forte">Forte</span></td>
         </tr>
         <tr>
@@ -604,7 +607,7 @@
           <td>Qualidade bruta de geracao</td>
           <td class="col-highlight"><span class="badge-strong badge-fraco">Fraco</span></td>
           <td><span class="badge-strong badge-forte">Forte</span></td>
-          <td><span class="badge-strong badge-medio">Medio-Forte</span></td>
+          <td><span class="badge-strong badge-medio-forte">Medio-Forte</span></td>
           <td><span class="badge-strong badge-forte">Forte</span></td>
         </tr>
         <tr>
@@ -612,7 +615,7 @@
           <td class="col-highlight"><span class="badge-strong badge-fraco">Fraco</span></td>
           <td><span class="badge-strong badge-forte">Forte</span></td>
           <td><span class="badge-strong badge-forte">Forte</span></td>
-          <td><span class="badge-strong badge-medio">Medio-Forte</span></td>
+          <td><span class="badge-strong badge-medio-forte">Medio-Forte</span></td>
         </tr>
         <tr>
           <td>Benchmark reproduzivel</td>
@@ -633,7 +636,7 @@
           <td class="col-highlight"><span class="badge-strong badge-fraco">Fraco</span></td>
           <td><span class="badge-strong badge-forte">Forte</span></td>
           <td><span class="badge-strong badge-medio">Medio</span></td>
-          <td><span class="badge-strong badge-medio">Medio-Forte</span></td>
+          <td><span class="badge-strong badge-medio-forte">Medio-Forte</span></td>
         </tr>
         <tr>
           <td>Comunidade</td>
@@ -647,7 +650,7 @@
           <td class="col-highlight"><span class="badge-strong badge-forte">Forte</span></td>
           <td><span class="badge-strong badge-forte">Forte</span></td>
           <td><span class="badge-strong badge-forte">Forte</span></td>
-          <td><span class="badge-strong badge-medio">Medio-Forte</span></td>
+          <td><span class="badge-strong badge-medio-forte">Medio-Forte</span></td>
         </tr>
         <tr>
           <td>Edicao cirurgica</td>
